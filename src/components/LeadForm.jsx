@@ -34,11 +34,15 @@ export default function LeadForm({ onSuccess }) {
       formData.append("email", form.email);
       formData.append("phone", form.phone);
 
-      await fetch(GOOGLE_SCRIPT_URL, {
+      const fetchPromise = fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         body: formData,
         mode: "no-cors",
       });
+      const timeoutPromise = new Promise((resolve) =>
+        setTimeout(resolve, 1000)
+      );
+      await Promise.race([fetchPromise, timeoutPromise]);
 
       setForm({ name: "", email: "", phone: "" });
       onSuccess?.();
