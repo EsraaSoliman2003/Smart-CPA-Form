@@ -1,0 +1,22 @@
+{
+  "enter_data": "Enter Your Details",
+  "enter_data_subtitle": "Fill out the form and start your journey with us",
+  "name": "Name",
+  "name_placeholder": "Enter your full name",
+  "email": "Email",
+  "email_placeholder": "Enter your email address",
+  "phone": "Phone Number (optional)",
+  "phone_placeholder": "Enter your phone number",
+  "submit": "Submit Request",
+  "sending": "Sending...",
+  "error": "An error occurred, please try again",
+  "thank_you_title": "Thank You!",
+  "thank_you_message": "Your request has been received successfully. Our team will contact you as soon as possible.",
+  "thank_you_note1": "We'll contact you within 24 hours",
+  "thank_you_note2": "We appreciate your trust",
+  "privacy_note": "Your data is protected with advanced encryption",
+  "privacy_assurance": "Your privacy is our priority",
+  "contact_info": "For inquiries: info@example.com | +966 123 456 789",
+  "whats_next": "What's Next",
+  "next_steps": "Our team will contact you within 24 business hours"
+}
