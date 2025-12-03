@@ -14,8 +14,8 @@
     "framer-motion": "^12.23.25",
     "i18next": "^25.5.3",
     "lucide-react": "^0.555.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
     "react-i18next": "^16.0.0",
     "react-icons": "^5.5.0"
   },
