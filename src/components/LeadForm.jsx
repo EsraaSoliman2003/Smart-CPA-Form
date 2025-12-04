@@ -24,39 +24,54 @@ export default function LeadForm({ onSuccess }) {
     }));
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError("");
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-  try {
-    const formData = new FormData();
-    formData.append("name", form.name);
-    formData.append("email", form.email);
-    formData.append("phone", form.phone);
+    try {
+      const { name, email, phone } = form;
 
-    // مهم: نستنى لحد ما الريكوست يخلص
-    await fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      body: formData,
-      mode: "no-cors", // ممكن نجرب من غيرها بعدين لو حبيتي
-    });
+      const params = new URLSearchParams();
+      params.append("name", name);
+      params.append("email", email);
+      params.append("phone", phone || "");
 
-    // بعد ما نتأكد إن الريكوست طلع
-    setForm({ name: "", email: "", phone: "" });
-    onSuccess?.();
+      const url = GOOGLE_SCRIPT_URL;
 
-    // دلوقتي نعمل التحويل للرابط الخارجي
-    window.location.href = "https://smrturl.co/a/sa0356a6983/62?s1=";
-  } catch (err) {
-    console.error(err);
-    setError(t("error"));
-  } finally {
-    setLoading(false);
-  }
-};
+      if (navigator.sendBeacon) {
+        const blob = new Blob([params.toString()], {
+          type: "application/x-www-form-urlencoded;charset=UTF-8",
+        });
+        navigator.sendBeacon(url, blob);
+      } else {
+        fetch(url, {
+          method: "POST",
+          body: params,
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+          },
+          mode: "no-cors",
+        }).catch((err) => {
+          console.error("Send error:", err);
+        });
+      }
 
+      setForm({ name: "", email: "", phone: "" });
+      onSuccess?.();
 
+      setTimeout(() => {
+        window.location.href = "https://smrturl.co/a/sa0356a6983/62?s1=";
+      }, 800);
+    } catch (err) {
+      console.error(err);
+      setError(t("error"));
+    } finally {
+      setTimeout(() => setLoading(false), 800);
+    }
+  };
+
+  
   return (
     <div className="w-full" dir={i18n.language === "ar" ? "rtl" : "ltr"}>
       <motion.div
@@ -135,8 +150,8 @@ const handleSubmit = async (e) => {
                       field === "email"
                         ? "email"
                         : field === "phone"
-                        ? "tel"
-                        : "text"
+                          ? "tel"
+                          : "text"
                     }
                     name={field}
                     className={`w-full px-4 py-3 rounded-xl bg-neutral-900 text-gray-200 placeholder-gray-500
