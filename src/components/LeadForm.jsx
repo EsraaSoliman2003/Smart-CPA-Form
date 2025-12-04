@@ -24,34 +24,38 @@ export default function LeadForm({ onSuccess }) {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
-    try {
-      const formData = new FormData();
-      formData.append("name", form.name);
-      formData.append("email", form.email);
-      formData.append("phone", form.phone);
+  try {
+    const formData = new FormData();
+    formData.append("name", form.name);
+    formData.append("email", form.email);
+    formData.append("phone", form.phone);
 
-      fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        body: formData,
-        mode: "no-cors",
-      });
+    // مهم: نستنى لحد ما الريكوست يخلص
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      body: formData,
+      mode: "no-cors", // ممكن نجرب من غيرها بعدين لو حبيتي
+    });
 
-      setForm({ name: "", email: "", phone: "" });
-      onSuccess?.();
+    // بعد ما نتأكد إن الريكوست طلع
+    setForm({ name: "", email: "", phone: "" });
+    onSuccess?.();
 
-      window.location.href = "https://smrturl.co/a/sa0356a6983/62?s1=";
-    } catch (err) {
-      console.error(err);
-      setError(t("error"));
-    } finally {
-      setLoading(false);
-    }
-  };
+    // دلوقتي نعمل التحويل للرابط الخارجي
+    window.location.href = "https://smrturl.co/a/sa0356a6983/62?s1=";
+  } catch (err) {
+    console.error(err);
+    setError(t("error"));
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="w-full" dir={i18n.language === "ar" ? "rtl" : "ltr"}>
