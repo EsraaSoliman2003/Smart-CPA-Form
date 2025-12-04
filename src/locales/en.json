@@ -7,8 +7,10 @@
   "email_placeholder": "Enter your email address",
   "phone": "Phone Number (optional)",
   "phone_placeholder": "Enter your phone number",
-  "submit": "Submit Request",
+  
+  "submit": "Register",
   "sending": "Sending...",
+
   "error": "An error occurred, please try again",
   "thank_you_title": "Thank You!",
   "thank_you_message": "Your request has been received successfully. Our team will contact you as soon as possible.",

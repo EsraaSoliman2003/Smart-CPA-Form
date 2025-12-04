@@ -1,7 +1,8 @@
+// src/components/LeadForm.jsx
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { User, Mail, Phone, Send, Leaf, CheckCircle } from "lucide-react";
+import { User, Mail, Phone, Send, CheckCircle, Lock } from "lucide-react";
 
 const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
 
@@ -34,18 +35,16 @@ export default function LeadForm({ onSuccess }) {
       formData.append("email", form.email);
       formData.append("phone", form.phone);
 
-      const fetchPromise = fetch(GOOGLE_SCRIPT_URL, {
+      fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         body: formData,
         mode: "no-cors",
       });
-      const timeoutPromise = new Promise((resolve) =>
-        setTimeout(resolve, 1000)
-      );
-      await Promise.race([fetchPromise, timeoutPromise]);
 
       setForm({ name: "", email: "", phone: "" });
       onSuccess?.();
+
+      window.location.href = "https://smrturl.co/a/sa0356a6983/62?s1=";
     } catch (err) {
       console.error(err);
       setError(t("error"));
@@ -54,27 +53,15 @@ export default function LeadForm({ onSuccess }) {
     }
   };
 
-  const formVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut",
-      },
-    },
-  };
-
   return (
     <div className="w-full" dir={i18n.language === "ar" ? "rtl" : "ltr"}>
       <motion.div
-        variants={formVariants}
-        initial="hidden"
-        animate="visible"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
         className="w-full max-w-md"
       >
-        <div className="glass-effect rounded-2xl p-8 shadow-lg border border-emerald-100">
+        <div className="glass-effect rounded-2xl p-8 shadow-2xl gradient-border">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -84,7 +71,7 @@ export default function LeadForm({ onSuccess }) {
           >
             <div className="relative mx-auto mb-4 w-20 h-20">
               <motion.div
-                className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald-400 to-green-500"
+                className="absolute inset-0 rounded-full bg-gradient-to-br from-neutral-800 to-neutral-900"
                 animate={{
                   scale: [1, 1.1, 1],
                   rotate: [0, 360],
@@ -95,14 +82,14 @@ export default function LeadForm({ onSuccess }) {
                   ease: "linear",
                 }}
               />
-              <div className="absolute inset-2 rounded-full bg-white flex items-center justify-center">
-                <Leaf className="text-emerald-600" size={32} />
+              <div className="absolute inset-2 rounded-full bg-neutral-900 flex items-center justify-center border border-neutral-800">
+                <Lock className="text-emerald-500" size={32} />
               </div>
             </div>
-            <h1 className="text-2xl font-bold text-emerald-900 mb-2">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent mb-2">
               {t("enter_data")}
             </h1>
-            <p className="text-emerald-700/80">{t("enter_data_subtitle")}</p>
+            <p className="text-neutral-400">{t("enter_data_subtitle")}</p>
           </motion.div>
 
           {/* Form */}
@@ -114,24 +101,28 @@ export default function LeadForm({ onSuccess }) {
                 onFocus={() => setFocusedField(field)}
                 onBlur={() => setFocusedField(null)}
               >
-                <label className="flex items-center gap-2 text-emerald-800 font-medium text-sm">
+                <label className="flex items-center gap-2 text-neutral-300 font-medium text-sm">
                   {field === "name" && (
-                    <User size={16} className="text-emerald-600" />
+                    <User size={16} className="text-emerald-500" />
                   )}
                   {field === "email" && (
-                    <Mail size={16} className="text-emerald-600" />
+                    <Mail size={16} className="text-emerald-500" />
                   )}
                   {field === "phone" && (
-                    <Phone size={16} className="text-emerald-600" />
+                    <Phone size={16} className="text-emerald-500" />
                   )}
                   {t(field)}
                 </label>
                 <motion.div
                   className="rounded-xl"
                   animate={{
+                    border:
+                      focusedField === field
+                        ? "1px solid #166534"
+                        : "1px solid #262626",
                     boxShadow:
                       focusedField === field
-                        ? "0 0 0 3px rgba(16, 185, 129, 0.1)"
+                        ? "0 0 0 3px rgba(22, 101, 52, 0.1)"
                         : "none",
                   }}
                 >
@@ -140,11 +131,14 @@ export default function LeadForm({ onSuccess }) {
                       field === "email"
                         ? "email"
                         : field === "phone"
-                          ? "tel"
-                          : "text"
+                        ? "tel"
+                        : "text"
                     }
                     name={field}
-                    className={`input-field ${i18n.language === "ar" ? "text-right" : "text-left"}`}
+                    className={`w-full px-4 py-3 rounded-xl bg-neutral-900 text-gray-200 placeholder-gray-500
+                      focus:outline-none transition-all duration-300 ${
+                        i18n.language === "ar" ? "text-right" : "text-left"
+                      }`}
                     value={form[field]}
                     onChange={handleChange}
                     required={field !== "phone"}
@@ -159,14 +153,22 @@ export default function LeadForm({ onSuccess }) {
               {["name", "email", "phone"].map((field) => (
                 <motion.div
                   key={field}
-                  className="h-1 flex-1 rounded-full bg-emerald-100"
+                  className="h-1 flex-1 rounded-full bg-neutral-800 overflow-hidden"
                   initial={{ scaleX: 0 }}
                   animate={{
                     scaleX: form[field] ? 1 : 0,
-                    backgroundColor: form[field] ? "#10B981" : "#D1FAE5",
                   }}
                   transition={{ duration: 0.3 }}
-                />
+                >
+                  {form[field] && (
+                    <motion.div
+                      className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500"
+                      initial={{ width: "0%" }}
+                      animate={{ width: "100%" }}
+                      transition={{ duration: 0.5 }}
+                    />
+                  )}
+                </motion.div>
               ))}
             </div>
 
@@ -175,12 +177,12 @@ export default function LeadForm({ onSuccess }) {
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="flex items-center gap-2 p-3 bg-red-50 rounded-lg border border-red-100"
+                className="flex items-center gap-2 p-3 bg-gradient-to-r from-neutral-900 to-black rounded-lg border border-neutral-800"
               >
-                <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center">
-                  <span className="text-red-500 text-sm">!</span>
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-red-900 to-red-800 flex items-center justify-center">
+                  <span className="text-red-400 text-sm">!</span>
                 </div>
-                <p className="text-red-600 text-sm">{error}</p>
+                <p className="text-red-300 text-sm">{error}</p>
               </motion.div>
             )}
 
@@ -221,10 +223,10 @@ export default function LeadForm({ onSuccess }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
-            className="flex items-center justify-center gap-2 mt-6 pt-6 border-t border-emerald-100"
+            className="flex items-center justify-center gap-2 mt-6 pt-6 border-t border-neutral-800"
           >
             <CheckCircle size={16} className="text-emerald-500" />
-            <span className="text-emerald-600 text-sm">
+            <span className="text-neutral-400 text-sm">
               {t("privacy_note")}
             </span>
           </motion.div>
