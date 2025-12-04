@@ -18,7 +18,7 @@ const getInitialLanguage = () => {
     return savedLang;
   }
 
-  return "ar";
+  return "en";
 };
 
 i18n.use(initReactI18next).init({
@@ -27,7 +27,7 @@ i18n.use(initReactI18next).init({
     ar: { translation: ar },
   },
   lng: getInitialLanguage(),
-  fallbackLng: "ar",
+  fallbackLng: "en",
   interpolation: { escapeValue: false },
 });
 
