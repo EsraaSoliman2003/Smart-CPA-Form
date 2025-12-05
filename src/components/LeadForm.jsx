@@ -1,5 +1,5 @@
 // src/components/LeadForm.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { User, Mail, Phone, Send, CheckCircle, Lock } from "lucide-react";
@@ -16,6 +16,15 @@ export default function LeadForm({ onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [focusedField, setFocusedField] = useState(null);
+
+  const [ip, setIp] = useState("");
+
+  useEffect(() => {
+    fetch("https://api.ipify.org?format=json")
+      .then((res) => res.json())
+      .then((data) => setIp(data.ip))
+      .catch((err) => console.error("IP fetch error:", err));
+  }, []);
 
   const handleChange = (e) => {
     setForm((prev) => ({
@@ -36,6 +45,7 @@ export default function LeadForm({ onSuccess }) {
       params.append("name", name);
       params.append("email", email);
       params.append("phone", phone || "");
+      params.append("ip", ip || "");
 
       const url = GOOGLE_SCRIPT_URL;
 
@@ -71,7 +81,7 @@ export default function LeadForm({ onSuccess }) {
     }
   };
 
-  
+
   return (
     <div className="w-full" dir={i18n.language === "ar" ? "rtl" : "ltr"}>
       <motion.div
