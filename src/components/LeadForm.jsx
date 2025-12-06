@@ -8,30 +8,21 @@ const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
 
 export default function LeadForm({ onSuccess }) {
   const { t, i18n } = useTranslation();
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-  });
+  const [form, setForm] = useState({ name: "", email: "", phone: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [focusedField, setFocusedField] = useState(null);
-
   const [ip, setIp] = useState("");
 
   useEffect(() => {
     fetch("https://api.ipify.org?format=json")
       .then((res) => res.json())
       .then((data) => setIp(data.ip))
-      .catch((err) => console.error("IP fetch error:", err));
+      .catch(() => {});
   }, []);
 
-  const handleChange = (e) => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  const handleChange = (e) =>
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -39,31 +30,23 @@ export default function LeadForm({ onSuccess }) {
     setError("");
 
     try {
-      const { name, email, phone } = form;
-
       const params = new URLSearchParams();
-      params.append("name", name);
-      params.append("email", email);
-      params.append("phone", phone || "");
+      params.append("name", form.name);
+      params.append("email", form.email);
+      params.append("phone", form.phone || "");
       params.append("ip", ip || "");
-
-      const url = GOOGLE_SCRIPT_URL;
 
       if (navigator.sendBeacon) {
         const blob = new Blob([params.toString()], {
           type: "application/x-www-form-urlencoded;charset=UTF-8",
         });
-        navigator.sendBeacon(url, blob);
+        navigator.sendBeacon(GOOGLE_SCRIPT_URL, blob);
       } else {
-        fetch(url, {
+        fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
           body: params,
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-          },
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
           mode: "no-cors",
-        }).catch((err) => {
-          console.error("Send error:", err);
         });
       }
 
@@ -73,85 +56,75 @@ export default function LeadForm({ onSuccess }) {
       setTimeout(() => {
         window.location.href = "https://smrturl.co/a/sa0356a6983/62?s1=";
       }, 800);
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError(t("error"));
     } finally {
       setTimeout(() => setLoading(false), 800);
     }
   };
 
-
   return (
     <div className="w-full" dir={i18n.language === "ar" ? "rtl" : "ltr"}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-full max-w-md"
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-sm"
       >
-        <div className="glass-effect rounded-2xl p-8 shadow-2xl gradient-border">
+        <div className="bg-white/95 rounded-xl p-6 shadow-md">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-center mb-8"
+            className="text-center mb-6"
           >
-            <div className="relative mx-auto mb-4 w-20 h-20">
+            <div className="relative mx-auto mb-3 w-16 h-16">
               <motion.div
-                className="absolute inset-0 rounded-full bg-gradient-to-br from-neutral-800 to-neutral-900"
-                animate={{
-                  scale: [1, 1.1, 1],
-                  rotate: [0, 360],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
+                className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
+                animate={{ scale: [1, 1.1, 1], rotate: [0, 360] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
               />
-              <div className="absolute inset-2 rounded-full bg-neutral-900 flex items-center justify-center border border-neutral-800">
-                <Lock className="text-emerald-500" size={32} />
+              <div className="absolute inset-2 rounded-full bg-white flex items-center justify-center">
+                <Lock className="text-purple-600" size={24} />
               </div>
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent mb-2">
+            <h1 className="text-lg font-bold text-gray-800 mb-1">
               {t("enter_data")}
             </h1>
-            <p className="text-neutral-400">{t("enter_data_subtitle")}</p>
+            <p className="text-gray-600 text-sm">{t("enter_data_subtitle")}</p>
           </motion.div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {["name", "email", "phone"].map((field) => (
               <motion.div
                 key={field}
-                className="space-y-2"
                 onFocus={() => setFocusedField(field)}
                 onBlur={() => setFocusedField(null)}
+                className="space-y-1"
               >
-                <label className="flex items-center gap-2 text-neutral-300 font-medium text-sm">
+                <label className="flex items-center gap-2 text-gray-700 font-medium text-xs">
                   {field === "name" && (
-                    <User size={16} className="text-emerald-500" />
+                    <User size={14} className="text-purple-600" />
                   )}
                   {field === "email" && (
-                    <Mail size={16} className="text-emerald-500" />
+                    <Mail size={14} className="text-purple-600" />
                   )}
                   {field === "phone" && (
-                    <Phone size={16} className="text-emerald-500" />
+                    <Phone size={14} className="text-purple-600" />
                   )}
                   {t(field)}
                 </label>
+
                 <motion.div
-                  className="rounded-xl"
+                  className="rounded-lg "
                   animate={{
-                    border:
-                      focusedField === field
-                        ? "1px solid #166534"
-                        : "1px solid #262626",
+                    border: "2px solid",
+                    borderColor: focusedField === field ? "#8b5cf6" : "#d1d5db",
                     boxShadow:
                       focusedField === field
-                        ? "0 0 0 3px rgba(22, 101, 52, 0.1)"
+                        ? "0 0 0 3px rgba(139, 92, 246, 0.1)"
                         : "none",
                   }}
                 >
@@ -164,10 +137,9 @@ export default function LeadForm({ onSuccess }) {
                           : "text"
                     }
                     name={field}
-                    className={`w-full px-4 py-3 rounded-xl bg-neutral-900 text-gray-200 placeholder-gray-500
-                      focus:outline-none transition-all duration-300 ${
-                        i18n.language === "ar" ? "text-right" : "text-left"
-                      }`}
+                    className={`w-full px-3 py-2.5 rounded-lg bg-white text-sm text-gray-800 placeholder-gray-400 focus:outline-none ${
+                      i18n.language === "ar" ? "text-right" : "text-left"
+                    }`}
                     value={form[field]}
                     onChange={handleChange}
                     required={field !== "phone"}
@@ -177,49 +149,44 @@ export default function LeadForm({ onSuccess }) {
               </motion.div>
             ))}
 
-            {/* Progress Indicator */}
-            <div className="flex items-center gap-2">
+            {/* Progress */}
+            <div className="flex items-center gap-1.5">
               {["name", "email", "phone"].map((field) => (
                 <motion.div
                   key={field}
-                  className="h-1 flex-1 rounded-full bg-neutral-800 overflow-hidden"
-                  initial={{ scaleX: 0 }}
-                  animate={{
-                    scaleX: form[field] ? 1 : 0,
-                  }}
-                  transition={{ duration: 0.3 }}
+                  className="h-1 flex-1 rounded-full bg-gray-200 overflow-hidden"
+                  animate={{ scaleX: form[field] ? 1 : 0 }}
                 >
                   {form[field] && (
                     <motion.div
-                      className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500"
+                      className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
                       initial={{ width: "0%" }}
                       animate={{ width: "100%" }}
-                      transition={{ duration: 0.5 }}
                     />
                   )}
                 </motion.div>
               ))}
             </div>
 
-            {/* Error Message */}
+            {/* Error */}
             {error && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex items-center gap-2 p-3 bg-gradient-to-r from-neutral-900 to-black rounded-lg border border-neutral-800"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center gap-2 p-2.5 bg-red-50 rounded-lg border border-red-200 text-sm"
               >
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-red-900 to-red-800 flex items-center justify-center">
-                  <span className="text-red-400 text-sm">!</span>
-                </div>
-                <p className="text-red-300 text-sm">{error}</p>
+                <span className="w-5 h-5 flex items-center justify-center rounded-full bg-red-500 text-white text-xs">
+                  !
+                </span>
+                <p className="text-red-600">{error}</p>
               </motion.div>
             )}
 
-            {/* Submit Button */}
+            {/* Submit */}
             <motion.button
               type="submit"
               disabled={loading || !form.name || !form.email}
-              className={`btn-primary w-full flex items-center justify-center gap-2 mt-4 ${
+              className={`w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-semibold rounded-lg shadow-md transition ${
                 !form.name || !form.email ? "opacity-50 cursor-not-allowed" : ""
               }`}
               whileHover={form.name && form.email ? { scale: 1.02 } : {}}
@@ -229,35 +196,28 @@ export default function LeadForm({ onSuccess }) {
                 <>
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{
-                      duration: 1,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                    transition={{ duration: 1, repeat: Infinity }}
+                    className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
                   />
                   {t("sending")}
                 </>
               ) : (
                 <>
-                  <Send size={18} />
+                  <Send size={16} />
                   {t("submit")}
                 </>
               )}
             </motion.button>
           </form>
 
-          {/* Security Badge */}
+          {/* Security */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="flex items-center justify-center gap-2 mt-6 pt-6 border-t border-neutral-800"
+            className="flex items-center justify-center gap-2 mt-5 pt-5 border-t border-gray-200 text-xs text-gray-600"
           >
-            <CheckCircle size={16} className="text-emerald-500" />
-            <span className="text-neutral-400 text-sm">
-              {t("privacy_note")}
-            </span>
+            <CheckCircle size={14} className="text-purple-600" />
+            {t("privacy_note")}
           </motion.div>
         </div>
       </motion.div>

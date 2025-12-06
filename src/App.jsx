@@ -1,185 +1,169 @@
-// src/App.jsx
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { motion, AnimatePresence } from "framer-motion";
-import { Globe, Sparkles } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Gift, Globe, Sparkles } from "lucide-react";
 
 import LeadForm from "./components/LeadForm.jsx";
+import wallPaper from "./assets/wallPaper.png";
 
 export default function App() {
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const { i18n } = useTranslation();
   const currentLang = i18n.language;
-  const [particles, setParticles] = useState([]);
 
   useEffect(() => {
     document.documentElement.lang = currentLang;
   }, [currentLang]);
 
-  useEffect(() => {
-    const createParticle = () => {
-      const particle = {
-        id: Date.now(),
-        left: Math.random() * 100,
-        delay: Math.random() * 5,
-        duration: 5 + Math.random() * 10,
-        size: Math.random() * 4 + 1,
-      };
-      setParticles((prev) => [...prev, particle]);
-
-      setTimeout(() => {
-        setParticles((prev) => prev.filter((p) => p.id !== particle.id));
-      }, particle.duration * 1000);
-    };
-
-    const interval = setInterval(createParticle, 300);
-    return () => clearInterval(interval);
-  }, []);
+  const handleLanguageChange = (lang) => {
+    if (lang !== currentLang) {
+      i18n.changeLanguage(lang);
+    }
+  };
 
   return (
-    <motion.div
-      className="min-h-screen relative overflow-hidden bg-gradient-to-br from-black via-neutral-900 to-neutral-800"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-    >
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
-      
-      {/* Floating Particles */}
-      {particles.map((particle) => (
+    <div className="relative min-h-screen bg-white">
+      {/* زرار تغيير اللغة */}
+      <header className="fixed right-4 top-4 z-50">
+        <div className="flex gap-2 rounded-full p-1 shadow-xl bg-white/60 backdrop-blur-lg border border-white/40">
+          <button
+            type="button"
+            onClick={() => handleLanguageChange("ar")}
+            className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold transition-all ${
+              currentLang === "ar"
+                ? "bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-md"
+                : "text-purple-800 hover:bg-white/80"
+            }`}
+          >
+            <Globe size={14} />
+            العربية
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleLanguageChange("en")}
+            className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold transition-all ${
+              currentLang === "en"
+                ? "bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-md"
+                : "text-purple-800 hover:bg-white/80"
+            }`}
+          >
+            <Globe size={14} />
+            English
+          </button>
+        </div>
+      </header>
+
+      {/* الموبايل */}
+      <div className="lg:hidden">
         <motion.div
-          key={particle.id}
-          className="absolute top-0 z-0"
-          style={{ 
-            left: `${particle.left}%`,
-            width: `${particle.size}px`,
-            height: `${particle.size}px`,
-          }}
-          initial={{ y: -100, opacity: 0 }}
-          animate={{
-            y: "100vh",
-            opacity: [0, 0.8, 0.8, 0],
-          }}
-          transition={{
-            duration: particle.duration,
-            delay: particle.delay,
-            ease: "linear",
-          }}
+          className="relative min-h-screen bg-cover bg-center"
+          style={{ backgroundImage: `url(${wallPaper})` }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.7 }}
         >
-          <div className="w-full h-full bg-gradient-to-br from-white to-neutral-300 rounded-full"></div>
-        </motion.div>
-      ))}
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-purple-900/60 via-purple-800/40 to-transparent" />
 
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-20 -right-20 w-96 h-96 bg-gradient-to-br from-neutral-900 to-black rounded-full opacity-20 animate-float"></div>
-        <div
-          className="absolute -bottom-20 -left-20 w-96 h-96 bg-gradient-to-tr from-neutral-800 to-black rounded-full opacity-20 animate-float"
-          style={{ animationDelay: "2s" }}
-        ></div>
-        
-        {/* Subtle Shimmer Effects */}
-        <div className="absolute top-1/4 left-1/4 w-48 h-48 animate-shimmer rounded-full"></div>
-        <div 
-          className="absolute bottom-1/4 right-1/4 w-64 h-64 animate-shimmer rounded-full"
-          style={{ animationDelay: "1s" }}
-        ></div>
-      </div>
-
-      <div className="relative z-10 min-h-screen flex flex-col">
-        <motion.header
-          className="w-full flex justify-end px-4 pt-4"
-          initial={{ y: -30, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, type: "spring" }}
-        >
-          <div className="flex gap-2 glass-effect rounded-full p-1 shadow-2xl">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={() => i18n.changeLanguage("ar")}
-              className={`px-4 py-2 rounded-full font-medium transition-all duration-300 flex items-center gap-2 ${
-                currentLang === "ar"
-                  ? "gradient-bg text-white shadow-lg"
-                  : "text-neutral-300 hover:bg-neutral-900/50"
-              }`}
-            >
-              <Globe size={16} />
-              العربية
-            </motion.button>
-
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={() => i18n.changeLanguage("en")}
-              className={`px-4 py-2 rounded-full font-medium transition-all duration-300 flex items-center gap-2 ${
-                currentLang === "en"
-                  ? "gradient-bg text-white shadow-lg"
-                  : "text-neutral-300 hover:bg-neutral-900/50"
-              }`}
-            >
-              <Globe size={16} />
-              English
-            </motion.button>
-          </div>
-        </motion.header>
-
-        <main className="flex-1 flex items-center justify-center px-4 py-6">
-          <AnimatePresence mode="wait">
-            {!leadSubmitted ? (
-              <motion.div
-                key="form"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.4 }}
-                className="w-full max-w-md"
-              >
-                <LeadForm onSuccess={() => setLeadSubmitted(true)} />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="success"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-center"
-              >
-                <div className="glass-effect rounded-2xl p-8 shadow-2xl gradient-border">
+          <div className="relative z-10 flex min-h-screen flex-col justify-center px-5 py-6">
+            <main className="flex flex-1 items-center justify-center">
+              <AnimatePresence mode="wait">
+                {!leadSubmitted ? (
                   <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: "spring" }}
-                    className="w-20 h-20 mx-auto mb-6 rounded-full gradient-bg flex items-center justify-center"
+                    key="form"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.35 }}
+                    className="w-full max-w-sm"
                   >
-                    <Sparkles className="text-white" size={32} />
+                    <LeadForm onSuccess={() => setLeadSubmitted(true)} />
                   </motion.div>
-                  <h2 className="text-2xl font-bold bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent mb-4">
-                    Thank You!
-                  </h2>
-                  <p className="text-neutral-400">
-                    Your information has been submitted successfully.
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </main>
+                ) : (
+                  <motion.div
+                    key="success"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.35 }}
+                    className="bg-white/90 backdrop-blur-md rounded-3xl p-6 text-center shadow-2xl border border-purple-100"
+                  >
+                    <div className="bg-gradient-to-r from-purple-600 to-pink-500 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full shadow-lg">
+                      <Sparkles size={26} className="text-white" />
+                    </div>
 
-        {/* Floating Accent */}
-        <motion.div
-          className="absolute bottom-8 right-8 z-0"
-          animate={{
-            y: [0, -8, 0],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        >
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-neutral-800 to-neutral-900 opacity-50"></div>
+                    <h2 className="text-xl font-black text-purple-700 mb-1">
+                      🎉 Thank You! 🎉
+                    </h2>
+                    <p className="text-sm text-gray-700">
+                      Your information has been submitted!
+                    </p>
+                    <p className="mt-1 text-xs text-purple-700">Redirecting…</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </main>
+          </div>
         </motion.div>
       </div>
-    </motion.div>
+
+      {/* الديسكتوب */}
+      <div className="hidden min-h-screen lg:flex">
+        {/* الصورة */}
+        <div
+          className="flex-1 bg-cover bg-center"
+          style={{ backgroundImage: `url(${wallPaper})` }}
+        />
+
+        {/* الفورم */}
+        <div className="flex flex-1 flex-col items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 p-10">
+          <div className="w-full max-w-md">
+            <AnimatePresence mode="wait">
+              {!leadSubmitted ? (
+                <motion.div
+                  key="form"
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -30 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <LeadForm onSuccess={() => setLeadSubmitted(true)} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.35 }}
+                  className="bg-white/90 backdrop-blur-lg rounded-3xl p-8 text-center shadow-2xl border border-purple-100"
+                >
+                  <div className="bg-gradient-to-r from-purple-600 to-pink-500 mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full shadow-xl">
+                    <Sparkles size={32} className="text-white" />
+                  </div>
+
+                  <h2 className="text-2xl font-black text-purple-700 mb-2">
+                    🎉 Congratulations! 🎉
+                  </h2>
+
+                  <p className="text-base text-gray-700 mb-3">
+                    Your information has been submitted successfully!
+                  </p>
+
+                  <p className="text-sm font-semibold text-purple-700">
+                    Redirecting to your exclusive offer...
+                  </p>
+
+                  <div className="mt-6 animate-pulse text-sm text-gray-600">
+                    Preparing your reward…
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
