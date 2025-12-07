@@ -63,9 +63,6 @@ export default function App() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7 }}
         >
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-purple-900/60 via-purple-800/40 to-transparent" />
-
           <div className="relative z-10 flex min-h-screen flex-col justify-center px-5 py-6">
             <main className="flex flex-1 items-center justify-center">
               <AnimatePresence mode="wait">
