@@ -1,13 +1,11 @@
 // src/components/LeadForm.jsx
 import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { User, Mail, Phone, Send } from "lucide-react";
 
 const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
 
 export default function LeadForm({ onSuccess }) {
-  const { t, i18n } = useTranslation();
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -56,17 +54,33 @@ export default function LeadForm({ onSuccess }) {
         window.location.href = "https://smrturl.co/a/sa0356a6983/62?s1=";
       }, 800);
     } catch {
-      setError(t("error"));
+      setError("An error occurred, please try again");
     } finally {
       setTimeout(() => setLoading(false), 800);
     }
   };
 
+  const fields = [
+    {
+      name: "name",
+      label: "Name",
+      icon: User,
+      type: "text",
+      required: true,
+      placeholder: "Enter your full name",
+    },
+    {
+      name: "email",
+      label: "Email",
+      icon: Mail,
+      type: "email",
+      required: true,
+      placeholder: "Enter your email address",
+    },
+  ];
+
   return (
-    <div
-      className="w-full flex justify-center"
-      dir={i18n.language === "ar" ? "rtl" : "ltr"}
-    >
+    <div className="w-full flex justify-center" dir="ltr">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -76,44 +90,40 @@ export default function LeadForm({ onSuccess }) {
         <div className="bg-white/95 rounded-xl p-5 shadow-md">
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-3">
-            {["name", "email"].map((field) => (
-              <motion.div key={field} className="space-y-1">
-                <label className="flex items-center gap-1.5 text-gray-700 font-medium text-sm">
-                  {field === "name" && (
-                    <User size={15} className="text-purple-600" />
-                  )}
-                  {field === "email" && (
-                    <Mail size={15} className="text-purple-600" />
-                  )}
-                  {t(field)}
-                </label>
+            {fields.map(
+              ({ name, label, icon: Icon, type, required, placeholder }) => (
+                <motion.div key={name} className="space-y-1">
+                  <label className="flex items-center gap-1.5 text-gray-700 font-medium text-sm">
+                    <Icon size={15} className="text-purple-600" />
+                    {label}
+                  </label>
 
-                <motion.div
-                  className="rounded-lg border border-gray-300"
-                  animate={{
-                    borderColor: focusedField === field ? "#8b5cf6" : "#d1d5db",
-                    boxShadow:
-                      focusedField === field
-                        ? "0 0 0 3px rgba(139, 92, 246, 0.15)"
-                        : "none",
-                  }}
-                >
-                  <input
-                    type={field === "email" ? "email" : "text"}
-                    name={field}
-                    className={`w-full px-3 py-2 rounded-lg bg-white text-sm text-gray-800 placeholder-gray-400 focus:outline-none ${
-                      i18n.language === "ar" ? "text-right" : "text-left"
-                    }`}
-                    value={form[field]}
-                    onChange={handleChange}
-                    onFocus={() => setFocusedField(field)}
-                    onBlur={() => setFocusedField(null)}
-                    required
-                    placeholder={t(`${field}_placeholder`)}
-                  />
+                  <motion.div
+                    className="rounded-lg border border-gray-300"
+                    animate={{
+                      borderColor:
+                        focusedField === name ? "#8b5cf6" : "#d1d5db",
+                      boxShadow:
+                        focusedField === name
+                          ? "0 0 0 3px rgba(139, 92, 246, 0.15)"
+                          : "none",
+                    }}
+                  >
+                    <input
+                      type={type}
+                      name={name}
+                      className="w-full px-3 py-2 rounded-lg bg-white text-sm text-gray-800 placeholder-gray-400 focus:outline-none text-left"
+                      value={form[name]}
+                      onChange={handleChange}
+                      onFocus={() => setFocusedField(name)}
+                      onBlur={() => setFocusedField(null)}
+                      required={required}
+                      placeholder={placeholder}
+                    />
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            ))}
+              )
+            )}
 
             {/* Error */}
             {error && (
@@ -146,12 +156,12 @@ export default function LeadForm({ onSuccess }) {
                     transition={{ duration: 1, repeat: Infinity }}
                     className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
                   />
-                  {t("sending")}
+                  Sending...
                 </>
               ) : (
                 <>
                   <Send size={16} />
-                  {t("submit")}
+                  Register
                 </>
               )}
             </motion.button>
